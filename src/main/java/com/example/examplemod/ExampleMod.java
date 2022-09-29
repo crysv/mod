@@ -2,6 +2,7 @@ package com.example.examplemod;
 
 import com.mojang.authlib.yggdrasil.request.JoinMinecraftServerRequest;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.datafixers.util.Function15;
 import com.mojang.logging.LogUtils;
 
 import imgui.ImGui;
@@ -40,6 +41,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -48,6 +50,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.TickEvent.RenderTickEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -89,6 +92,8 @@ public class ExampleMod
     private KeyMapping keyR;
     private KeyMapping keyC;
 
+    private Ai ai;
+
     public ExampleMod()
     {
         // Register the setup method for modloading
@@ -109,6 +114,8 @@ public class ExampleMod
         keyR = new KeyMapping("key r", InputConstants.KEY_R, KeyMapping.CATEGORY_GAMEPLAY);
         keyC = new KeyMapping("key c", InputConstants.KEY_C, KeyMapping.CATEGORY_GAMEPLAY);
 
+        ai = new Ai();
+
         mc.options.gamma = 10000;
     }
 
@@ -122,15 +129,12 @@ public class ExampleMod
         return value;
     }
 
-    //Node[][] nodeGrid;
     int startx;
     int starty;
     int endx;
     int endy;
 
     double yJump = 6;
-
-    //private LinkedList<Node> path;
 
     @SubscribeEvent
     public void tick(PlayerTickEvent event) 
@@ -147,7 +151,6 @@ public class ExampleMod
                 {
                     p.setNoGravity(false);
                     p.setOnGround(true);
-                    //nodeGrid = getGraph();
                     Vec3 v = p.position();
                     long x = ((long)(v.x() * 1000)) % 10;
                     long z = ((long)(v.z() * 1000)) % 10;
@@ -172,27 +175,11 @@ public class ExampleMod
         }
     }
 
-    FakePlayer fakePlayer = null;
-
-    LocalPlayer r = null;
-
-    @SubscribeEvent
-	public void onPreRenderGame(RenderGameOverlayEvent.Pre event)
-    {
-        if (keyZ.isDown()) r = mc.player;
-	}
-    
     @SubscribeEvent
     public void render(RenderGameOverlayEvent.Post event)
     {
-        if (keyZ.isDown()) mc.player = r;
         
     } 
-
-    /*private Node[][] getGraph() {
-        
-        return null;
-    }*/
 
     @SubscribeEvent
     public void render(RenderGameOverlayEvent event)
